@@ -1,8 +1,15 @@
 <template>
   <div v-if="isImagesLoaded" class="h-full w-full p-3 flex flex-col items-center">
-    <img v-for="(imageSrc, index) in images" :key="index" class="h-[500px]  m-auto max-sm:w-11/12" :src="imageSrc"
-      v-show="currentIndex == index" />
-    <input class="w-[500px] pt-3 max-sm:w-10/12" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
+    <div  class="flex flex-col items-center">
+      <n-image-group>
+        <n-image v-for="(imageSrc, index) in images" :key="index"  class="h-[500px]  max-sm:w-11/12"
+            :src="imageSrc" v-show="currentIndex == index" />
+      </n-image-group>
+    </div>
+
+
+    <n-slider class="w-[500px] pt-3 max-sm:w-10/12" :step="1" :format-tooltip="formatTooltip" :min="0"
+      :max="images.length - 1" v-model:value="currentIndex" />
     <div class="p-3">
       <button class="border rounded-md p-2 bg-gray-300 text-black" @click="showModal = true">选择资源</button>
     </div>
@@ -167,7 +174,7 @@ const imagesDataLoading = ref(false);
 const isImagesLoaded = ref(false);
 const loadedImagesCount = ref(0);
 const loadingStatus = computed(() => `已加载 ${loadedImagesCount.value} 张图片`);
-
+const formatTooltip = (value) => `${value + 1}`;
 const currentIndex = ref(0);
 function loadAllImages(data) {
   if (data) {
