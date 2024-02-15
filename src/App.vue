@@ -18,7 +18,7 @@
       <template #default>
         <n-spin :show="Loading" size="large">
           <template #description>
-            <p>{{ loadingStatus }}</p>
+            <p>{{ loadingStatus }}/ {{ images.length }}</p>
           </template>
           <div>
             <div>
