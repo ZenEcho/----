@@ -2,7 +2,7 @@
   <div v-if="isImagesLoaded" class="h-full w-full p-3 flex flex-col items-center">
     <img v-for="(imageSrc, index) in images" :key="index" class="h-[500px] m-auto" :src="imageSrc"
       v-show="currentIndex == index" />
-    <input class="w-[500px] pt-3" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
+    <input class="w-[500px] pt-3 max-sm:w-11/12" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
   </div>
   <div v-else class="p-3">
     <n-result status="404" title="404 资源不存在" description="生活总归带点荒谬">
@@ -12,10 +12,8 @@
     </n-result>
   </div>
 
-
-
   <n-modal v-model:show="showModal">
-    <n-card class="w-1/2 max-sm:w-[90%]" :bordered="false" size="huge" role="dialog" aria-modal="true" closable
+    <n-card class="w-1/2 max-sm:w-11/12" :bordered="false" size="huge" role="dialog" aria-modal="true" closable
       @close="showModal = false">
       <template #header>
         <div class="border-b">
