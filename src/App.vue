@@ -55,7 +55,7 @@
                 <template #description>
                   <p>加载中...</p>
                 </template>
-                <div class="flex flex-wrap justify-center border">
+                <div class="flex flex-wrap justify-center">
                   <div v-for="(data, index) in networkData">
                     <n-popover trigger="hover">
                       <template #trigger>
@@ -197,7 +197,6 @@ function loadAllImages(data) {
 function defaultImageRequest() {
   for (let i = 1; i <= 41; i++) {
     const imagePath = new URL(`./assets/images/${i}.webp?cache`, import.meta.url).href;
-    console.log(new URL(`./assets/images/${i}.webp?cache`, import.meta.url).href);
     images.value.push(imagePath);
   }
   loadAllImages()
