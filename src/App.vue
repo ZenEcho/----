@@ -1,8 +1,8 @@
 <template>
   <div v-if="isImagesLoaded" class="h-full w-full p-3 flex flex-col items-center">
-    <img v-for="(imageSrc, index) in images" :key="index" class="h-[500px] m-auto" :src="imageSrc"
+    <img v-for="(imageSrc, index) in images" :key="index" class="h-[500px]  m-auto max-sm:w-11/12" :src="imageSrc"
       v-show="currentIndex == index" />
-    <input class="w-[500px] pt-3 max-sm:w-11/12" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
+    <input class="w-[500px] pt-3 max-sm:w-10/12" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
   </div>
   <div v-else class="p-3">
     <n-result status="404" title="404 资源不存在" description="生活总归带点荒谬">
@@ -18,14 +18,14 @@
       <template #header>
         <div class="border-b">
           <span>欢迎使用</span>
-
         </div>
 
       </template>
       <template #default>
         <n-spin :show="Loading" size="large">
           <template #description>
-            <p>{{ loadingStatus }}/ 总共 {{ images.length }} 张图片</p>
+            <p v-if="loadedImagesCount > 0">{{ loadingStatus }}/ 总共 {{ images.length }} 张图片</p>
+            <p v-else>加载中...</p>
           </template>
           <div>
             <div>
@@ -50,12 +50,14 @@
                 </n-popover>
               </div>
 
-              <div>
+              <div v-for="(data, index) in networkData">
                 <n-popover trigger="hover">
                   <template #trigger>
-                    <button
-                      class=" min-w-40 h-[70px] m-2 border p-2 bg-red-300 rounded-lg flex items-center justify-center">
-                      <svg t="1707961905117" class=" w-8 h-8" viewBox="0 0 1037 1024" version="1.1"
+                    <button :class="{
+                      'bg-red-300 text-red-900': data.region === 'cn',
+                      'bg-gray-300 text-gray-900': data.region === 'global'
+                    }" class=" min-w-40 h-[70px] m-2 border p-2 rounded-lg flex items-center justify-center">
+                      <svg v-if="data.region === 'cn'" t="1707961905117" class=" w-8 h-8" viewBox="0 0 1037 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="21213" width="200" height="200">
                         <path
                           d="M421.13004699 587.087927l94.772288-94.771435L622.44443399 598.859445 527.67299999 693.63088zM409.20571799 377.225551l94.771435-94.771435 106.542953 106.542953L515.74867099 483.768504zM724.46027399 487.200333l84.003001-84.003001 95.613173 20.317799 21.427594 93.649688S908.17415499 578.374323 872.91679799 578.288954c-35.257357-0.170738-159.810588-66.758483-148.456524-91.088621zM281.99324599 487.200333s-40.46486-62.746144-66.502376-64.368153c-26.122885-1.622009-101.759733 65.990163-26.378991 143.931972 81.01509-45.416257 92.881367-79.563818 92.881367-79.563819z"
@@ -115,21 +117,7 @@
                           d="M508.30620999 178.677115c-49.257857 0-89.295873-40.038016-89.295873-89.295873S458.96298399 0 508.30620999 0s89.295873 40.123385 89.295873 89.381242-40.038016 89.295873-89.295873 89.295873z m0-137.187828c-26.378991 0-47.806586 21.427595-47.806586 47.806586s21.427595 47.806586 47.806586 47.806586 47.806586-21.427595 47.806586-47.806586-21.512964-47.806586-47.806586-47.806586z"
                           fill="#333333" p-id="21232"></path>
                       </svg>
-                      <span class="ml-2 text-red-900">国内图片资源</span></button>
-                  </template>
-                  <div>
-                    <p>如果你在中国，使用这个可以提高图片的加载速度噢！</p>
-                  </div>
-                </n-popover>
-
-              </div>
-
-              <div>
-                <n-popover trigger="hover">
-                  <template #trigger>
-                    <button
-                      class=" min-w-40 h-[70px] m-2 border p-2 bg-gray-300 rounded-lg flex items-center justify-center">
-                      <svg t="1707961997854" class=" w-8 h-8" viewBox="0 0 1024 1024" version="1.1"
+                      <svg v-else t="1707961997854" class=" w-8 h-8" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="22303" width="200" height="200">
                         <path
                           d="M986.069333 682.88c-18.858667-29.098667-58.752-36.010667-88.746666-18.688l-137.301334 79.232-195.712-108.672-73.941333 42.666667 145.92 137.472-109.013333 62.933333-94.421334-44.032-55.424 32 177.066667 116.906667a42.666667 42.666667 0 0 0 44.8 1.322666l69.546667-40.106666 295.594666-170.666667a64 64 0 0 0 21.632-90.368"
@@ -138,12 +126,10 @@
                           d="M512 42.666667C253.184 42.666667 42.666667 253.184 42.666667 512c0 158.549333 79.232 305.28 211.882666 392.490667l46.890667-71.338667a390.101333 390.101333 0 0 1-43.904-33.706667l59.690667-97.834666a64.426667 64.426667 0 0 0-15.616-84.522667 85.418667 85.418667 0 0 1-30.421334-88.917333l12.074667-46.762667A80.938667 80.938667 0 0 0 237.397333 386.986667l-75.050666-32.896a385.706667 385.706667 0 0 1 209.792-199.338667l-12.501334 33.493333a167.338667 167.338667 0 0 0 81.834667 208.426667l35.157333 17.578667a188.416 188.416 0 0 1 80.469334 77.013333l57.173333 102.912c23.893333 43.093333 85.333333 44.629333 111.445333 2.858667l41.216-65.962667a132.394667 132.394667 0 0 0 6.144-129.450667 53.76 53.76 0 0 1 20.48-70.229333l42.069334-25.216a381.44 381.44 0 0 1 56.405333 261.205333l84.48 12.202667C979.712 557.354667 981.333333 534.613333 981.333333 512c0-258.816-210.517333-469.333333-469.333333-469.333333"
                           fill="#1768E4" p-id="22305"></path>
                       </svg>
-                      <span class="ml-2 text-gray-900">海外图片资源</span></button>
+                      <span class="ml-2 ">{{ data.name }}</span></button>
                   </template>
                   <div>
-                    <span>
-                      当你在海外使用这个,速度可能会比使用中国资源快一点的
-                    </span>
+                    <a :href="data.author.website" target="_blank">{{ data.description }}</a>
                   </div>
                 </n-popover>
 
@@ -163,24 +149,19 @@
 
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 const showModal = ref(true);
 // 动态生成图片路径数组
 const images = ref([]);
+const networkData = ref([]);
 const Loading = ref(false);
 const isImagesLoaded = ref(false);
 const loadedImagesCount = ref(0);
 const loadingStatus = computed(() => `已加载 ${loadedImagesCount.value} 张图片`);
 
-for (let i = 1; i <= 41; i++) {
-  const imagePath = new URL(`./assets/images/${i}.webp?cache`, import.meta.url).href;
-  images.value.push(imagePath);
-}
-
 const currentIndex = ref(0);
-const currentImage = computed(() => images.value[currentIndex.value]);
-
 function loadAllImages() {
+  defaultImageRequest()
   Loading.value = true;
   loadedImagesCount.value = 0; // 重置已加载图片计数
   const loadPromises = images.value.map(src => {
@@ -202,5 +183,36 @@ function loadAllImages() {
     })
     .catch(error => console.error("Failed to load images", error));
 }
+function defaultImageRequest() {
+  for (let i = 1; i <= 41; i++) {
+    const imagePath = new URL(`./assets/images/${i}.webp?cache`, import.meta.url).href;
+    images.value.push(imagePath);
+  }
+}
 
+function networkImageRequest() {
+  Loading.value = true;
+  fetch('https://cors-anywhere.pnglog.com/https://assets-json.pnglog.com/kumufengchun.json')
+    .then(res => res.json())
+    .then(data => {
+      try {
+        networkData.value = data
+        data.forEach((item) => {
+          console.log(item);
+        });
+        Loading.value = false;
+      } catch (error) {
+        Loading.value = false;
+      }
+
+      // images.value = data.images;
+
+    })
+    .catch(error => console.error("Failed to load images", error));
+}
+
+// vue 加载完毕执行
+onMounted(() => {
+  networkImageRequest()
+});
 </script>
