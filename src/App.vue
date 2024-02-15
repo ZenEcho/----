@@ -1,17 +1,42 @@
 <template>
+  <div class="flex flex-col items-center py-6"><svg t="1707982801706" class="icon" viewBox="0 0 1024 1024" version="1.1"
+      xmlns="http://www.w3.org/2000/svg" p-id="3491" width="200" height="200">
+      <path
+        d="M544.644295 6.872483c63.00349 0 129.50851 12.088698 173.186577 51.962846 70.346738 64.216483 60.756188 119.141369 60.756188 119.141369s107.093906 9.439356 156.764779 101.104537C997.843329 394.40494 943.248322 463.892617 943.248322 463.892617s41.169611 52.629477 27.661745 120.306255C932.668134 775.759034 748.090416 893.422819 544.644295 893.422819c-235.324134 0-470.765101-139.226201-470.7651-374.550336 0-105.458255 92.434899-171.901423 92.434899-171.901423s-32.792054-70.786577 13.525047-175.468241C234.55098 47.829047 382.515544 6.872483 544.644295 6.872483z"
+        fill="#1BD86B" p-id="3492"></path>
+      <path
+        d="M947.430228 304.048966s-7.425718-16.390872-12.074953-24.971167c-49.670872-91.661745-156.764779-101.104537-156.764778-101.104537s9.59055-54.92145-60.759625-119.137933C674.152805 18.961181 607.647785 6.872483 544.644295 6.872483 382.515544 6.872483 234.55098 47.829047 179.828832 171.502819 133.511732 276.181047 166.314094 346.97106 166.314094 346.97106S73.879195 413.414228 73.879195 518.872483a319.618577 319.618577 0 0 0 51.103785 175.530094c11.487356 17.851275 39.344966 50.224107 39.344966 50.224108s163.541047-188.01396 355.097772-295.784806c199.820886-112.433826 428.00451-144.792913 428.00451-144.792913z"
+        fill="#4CF092" p-id="3493"></path>
+      <path
+        d="M553.764081 355.651007s31.321342 444.450362 34.362416 596.187919c1.144268 57.155007 58.416107 70.442953 58.416107 70.442953h-209.610738s62.996617-7.559732 65.28859-70.442953c5.525477-151.665396 37.798658-596.187919 37.798658-596.187919h13.744967z"
+        fill="#894E14" p-id="3494"></path>
+      <path
+        d="M735.218255 355.651007c5.047839 4.621745 5.415517 2.175141 0.824698 7.253906l-175.96306 208.380564c-4.590819 5.075329-12.404832 2.010201-17.449235-2.608108-5.047839-4.621745-5.415517-19.356349-0.824698-24.435114l186.271785-184.326872c4.590819-5.06502 2.096107-8.872376 7.14051-4.264376z"
+        fill="#894E14" p-id="3495"></path>
+      <path
+        d="M341.18443 544.644295c-5.044403 4.621745-1.979275 5.611383 2.611543 10.690148l179.399302 232.434255c4.590819 5.075329 5.532349-1.42604 10.576752-19.789315v-3.436242c5.047839-4.621745 5.415517-33.101315 0.824698-38.180081l-182.835544-180.880322c-4.590819-5.075329-5.532349-5.446443-10.576751-0.838443z"
+        fill="#894E14" p-id="3496"></path>
+    </svg> <span class="text-4xl font-bold mt-2">枯木逢春</span></div>
   <div v-if="isImagesLoaded" class="h-full w-full p-3 flex flex-col items-center">
-    <div  class="flex flex-col items-center">
+    <div class="flex flex-col items-center">
       <n-image-group>
-        <n-image v-for="(imageSrc, index) in images" :key="index"  class="h-[500px]  max-sm:w-11/12"
-            :src="imageSrc" v-show="currentIndex == index" />
+        <n-image v-for="(imageSrc, index) in images" :key="index" class="h-[500px]  max-sm:w-11/12" :src="imageSrc"
+          v-show="currentIndex == index" />
       </n-image-group>
     </div>
-
-
     <n-slider class="w-[500px] pt-3 max-sm:w-10/12" :step="1" :format-tooltip="formatTooltip" :min="0"
       :max="images.length - 1" v-model:value="currentIndex" />
     <div class="p-3">
       <button class="border rounded-md p-2 bg-gray-300 text-black" @click="showModal = true">选择资源</button>
+    </div>
+    <div class=" w-full bg-gray-200 text-center p-4">
+      <div>
+        <p>与图片服务器的延迟:{{ completeData.delay }}ms</p>
+        <p>单张图片加载耗时:{{ completeData.averageTime }}ms</p>
+        <p>图片加载总耗时:{{ completeData.totalTime }}ms</p>
+        <p>图片加载总量:{{ images.length }}</p>
+        <p>使用的设备: {{ deviceType }}</p>
+      </div>
     </div>
   </div>
   <div v-else class="p-3">
@@ -173,15 +198,35 @@ const Loading = ref(false);
 const imagesDataLoading = ref(false);
 const isImagesLoaded = ref(false);
 const loadedImagesCount = ref(0);
+const completeData = ref({});
 const loadingStatus = computed(() => `已加载 ${loadedImagesCount.value} 张图片`);
 const formatTooltip = (value) => `${value + 1}`;
 const currentIndex = ref(0);
+const userAgent = navigator.userAgent;
+
+const deviceType = computed(() => {
+  if (/android/i.test(userAgent)) {
+    return "Android";
+  } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    return "iOS";
+  } else if (/Win(dows)?/i.test(userAgent)) {
+    return "Windows PC";
+  } else if (/Mac(iPhone)?/i.test(userAgent)) {
+    return "MacOS";
+  } else if (/Linux/i.test(userAgent)) {
+    return "Linux";
+  } else {
+    return "Unknown";
+  }
+});
 function loadAllImages(data) {
   if (data) {
-    images.value = data
+    images.value = data;
   }
   Loading.value = true;
   loadedImagesCount.value = 0; // 重置已加载图片计数
+  const startTime = Date.now(); // 开始加载的时间戳
+
   const loadPromises = images.value.map(src => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -196,12 +241,46 @@ function loadAllImages(data) {
 
   Promise.all(loadPromises)
     .then(() => {
+      const endTime = Date.now(); // 所有图片加载完成的时间戳
+      const totalTime = endTime - startTime; // 总耗时，单位是毫秒
+      const averageTime = totalTime / images.value.length; // 每张图平均耗时
+      completeData.value.totalTime = totalTime;
+      completeData.value.averageTime = averageTime.toFixed(2);
       isImagesLoaded.value = true; // 所有图片加载完成
       Loading.value = false;
+
+      measureRequestDelay(images.value[0]);
     })
-    .catch(error => console.error("Failed to load images", error));
+    .catch(error => {
+      console.error("Failed to load images", error);
+      Loading.value = false;
+    });
 }
+async function measureRequestDelay(imageUrl) {
+  console.log(imageUrl);
+  const startTime = performance.now(); // 开始请求的时间戳
+  const url = new URL(imageUrl);
+  const domain = `${url.protocol}//${url.host}`; // 构建域名URL
+  try {
+    const response = await fetch("https://cors-anywhere.pnglog.com/" + domain, { method: 'HEAD' }); // 使用HEAD方法请求
+    if (response.ok) {
+      const endTime = performance.now(); // 收到响应的时间戳
+      const delay = endTime - startTime; // 计算延迟
+      completeData.value.delay = delay.toFixed(2);
+
+      return delay; // 返回延迟时间
+    } else {
+      console.error(`Request failed with status: ${response.status}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`Error measuring request delay: ${error}`);
+    return null;
+  }
+}
+
 function defaultImageRequest() {
+  images.value = [];
   for (let i = 1; i <= 41; i++) {
     const imagePath = new URL(`./assets/images/${i}.webp?cache`, import.meta.url).href;
     images.value.push(imagePath);
@@ -246,5 +325,6 @@ async function networkImageRequest() {
 // vue 加载完毕执行
 onMounted(() => {
   networkImageRequest()
+
 });
 </script>
