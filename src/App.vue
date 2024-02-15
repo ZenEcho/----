@@ -1,8 +1,8 @@
 <template>
-  <div v-if="isImagesLoaded" class="h-full w-full p-3">
-    <img class="h-[500px] m-auto" :src="currentImage" />
-    <input class="w-full pt-3" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
-  </div>
+<div v-if="isImagesLoaded" class="h-full w-full p-3">
+  <img v-for="(imageSrc, index) in images" :key="index" class="h-[500px] m-auto" :src="imageSrc" v-show="currentIndex == index" />
+  <input class="w-full pt-3" type="range" min="0" :max="images.length - 1" v-model="currentIndex" />
+</div>
 
 
   <n-modal v-model:show="showModal">
